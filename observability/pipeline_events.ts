@@ -56,7 +56,7 @@ pipeline.on('recording_failed', (data: Record<string, any>) => {
   logger.error(`recording FAILED: ${data?.error ?? ''}`);
 });
 
-pipeline.on('metrics.stt', (data: Record<string, unknown>) => {
+pipeline.metrics.on('stt', (data: Record<string, unknown>) => {
   logger.info(`stt metric collector  ${JSON.stringify(data)}`);
   logger.info(`stt ${JSON.stringify(data)}`);
 });
@@ -68,7 +68,7 @@ pipeline.on('metrics.stt', (data: Record<string, unknown>) => {
  * and if the session ends before you do, they are gone. Subscribe when you want
  * to react to slowness rather than report on it.
  */
-pipeline.on('metrics.llm', (data: Record<string, unknown>) => {
+pipeline.metrics.on('llm', (data: Record<string, unknown>) => {
   logger.info(`llm metric collector ${JSON.stringify(data)}`);
   logger.info(`llm ${JSON.stringify(data)}`);
 });

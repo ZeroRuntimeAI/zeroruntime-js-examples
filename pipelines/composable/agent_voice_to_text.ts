@@ -5,7 +5,13 @@
 import 'dotenv/config';
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
-import { Agent, Pipeline, Room, Session, get_logger } from '@zeroruntime/js-sdk';
+import {
+  Agent,
+  Pipeline,
+  PubSubPublishConfig,
+  Room,
+  get_logger,
+} from '@zeroruntime/js-sdk';
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
@@ -21,22 +27,9 @@ const pipeline = Pipeline({
   turn_detector: TurnDetector(),
 });
 
-let session: Session | null = null;
-
 /** What the caller said, as soon as they stopped saying it. */
 pipeline.on('user_turn_start', async (transcript: string) => {
   logger.info(`heard: ${transcript}`);
-});
-
-/**
- * The agent's answer. With no TTS this is the only output there is -- without
- * publishing it somewhere, this agent would think in silence.
- */
-pipeline.on('llm', async (data: Record<string, any>) => {
-  const text = data?.text ?? '';
-  if (!text.trim() || session === null) return;
-  logger.info(`answer: ${text}`);
-  await session.publish(OUT_TOPIC, text);
 });
 
 class VoiceToTextAgent extends Agent {
@@ -50,8 +43,20 @@ class VoiceToTextAgent extends Agent {
   }
 
   async on_enter(): Promise<void> {
-    session = this.session;
     logger.info('listening');
+  }
+
+  /**
+   * The agent's answer. With no TTS this is the only output there is -- without
+   * publishing it somewhere, this agent would think in silence.
+   */
+  async on_llm(data: Record<string, any>): Promise<void> {
+    const text = String(data?.text ?? '');
+    if (!text.trim()) return;
+    logger.info(`answer: ${text}`);
+    await this.session!.publish_to_pubsub(
+      PubSubPublishConfig({ topic: OUT_TOPIC, message: text }),
+    );
   }
 
   async on_exit(): Promise<void> {

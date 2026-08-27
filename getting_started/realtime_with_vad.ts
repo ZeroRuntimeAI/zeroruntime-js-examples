@@ -9,7 +9,7 @@ import 'dotenv/config';
 import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room } from '@zeroruntime/js-sdk';
 import { AICousticsDenoise } from '@zeroruntime/js-sdk/inference';
-import { GeminiRealtime, SileroVAD } from '@zeroruntime/js-sdk/plugins';
+import { GeminiLiveConfig, GeminiRealtime, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
 const AGENT_ID = process.env.AGENT_ID ?? 'realtime-basic-with-vad';
 
@@ -22,10 +22,10 @@ class MyVoiceAgent extends Agent {
       pipeline: Pipeline({
         llm: GeminiRealtime({
           model: 'gemini-3.1-flash-live-preview',
-          config: {
+          config: GeminiLiveConfig({
             voice: 'Leda',
             response_modalities: ['AUDIO'],
-          },
+          }),
         }),
         vad: SileroVAD(),
         denoise: AICousticsDenoise({ model_id: 'quail-vf-2.2-l-16khz' }),

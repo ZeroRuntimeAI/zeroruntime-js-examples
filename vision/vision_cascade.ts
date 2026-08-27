@@ -5,7 +5,13 @@
 import 'dotenv/config';
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
-import { Agent, Pipeline, Room, RoomMessage, get_logger } from '@zeroruntime/js-sdk';
+import {
+  Agent,
+  Pipeline,
+  PubSubSubscribeConfig,
+  Room,
+  get_logger,
+} from '@zeroruntime/js-sdk';
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
@@ -13,6 +19,8 @@ const logger = get_logger('vision_cascade');
 
 const AGENT_ID = process.env.AGENT_ID ?? 'vision-agent';
 const TOPIC = 'CHAT';
+
+const room = Room({ name: 'Vision Cascade', playground: true, vision: true });
 
 class VisionAgent extends Agent {
   constructor() {
@@ -32,14 +40,16 @@ class VisionAgent extends Agent {
   }
 
   async on_enter(): Promise<void> {
+    await this.session!.subscribe_to_pubsub(
+      PubSubSubscribeConfig({ topic: TOPIC, cb: this.on_chat.bind(this) }),
+    );
     await this.session!.say('Hello, how can I help you today?');
   }
 
-  async on_message(message: RoomMessage): Promise<void> {
-    if (message.backlog) return;
-    if (message.topic !== TOPIC || message.text !== 'capture_frames') return;
+  async on_chat(frame: Record<string, any>, backlog: boolean): Promise<void> {
+    if (backlog || String(frame?.message ?? '') !== 'capture_frames') return;
 
-    logger.info(`capturing frames on '${message.topic}'`);
+    logger.info(`capturing frames on '${TOPIC}'`);
     await this.session!.reply(
       'Please analyze this frame and describe what you see in details, within one line.',
       { frames: 2 },
@@ -52,14 +62,7 @@ class VisionAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
-    room: Room({
-      name: 'Vision Cascade',
-      playground: true,
-      vision: true,
-      subscribe: [TOPIC],
-    }),
-  });
+  await zeroruntime.invoke(AGENT_ID, { room });
   logger.info(`publish 'capture_frames' on the '${TOPIC}' topic to trigger a look`);
 }
 

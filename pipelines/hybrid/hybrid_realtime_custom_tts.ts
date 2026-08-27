@@ -6,7 +6,7 @@ import 'dotenv/config';
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room } from '@zeroruntime/js-sdk';
-import { CartesiaTTS, GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
+import { CartesiaTTS, GeminiLiveConfig, GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
 
 const AGENT_ID = process.env.AGENT_ID ?? 'hybrid-tts-agent';
 
@@ -19,7 +19,7 @@ class HybridVoiceAgent extends Agent {
       pipeline: Pipeline({
         realtime: GeminiRealtime({
           model: 'gemini-3.1-flash-live-preview',
-          config: { voice: 'Leda', response_modalities: ['AUDIO'] },
+          config: GeminiLiveConfig({ voice: 'Leda', response_modalities: ['AUDIO'] }),
         }),
         tts: CartesiaTTS(),
       }),

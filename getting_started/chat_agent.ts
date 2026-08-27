@@ -1,7 +1,10 @@
 // An agent you only type at: Pipeline({ llm }) infers LLM_ONLY, so there is
-// no STT, TTS or VAD -- chat text goes in and a tool posts back. The chat topic
-// is named at join, because the room does not exist until the agent has
-// connected.
+// no STT, TTS or VAD -- chat text goes in and a tool posts back.
+//
+// Everything the call needs is a method on the agent: the topic is subscribed
+// in on_enter with `this.on_chat` as the handler, and `on_llm` stands in for a
+// pipeline hook. Both reach the call through `this.session`, so nothing here
+// holds a module-level reference to it.
 
 import 'dotenv/config';
 
@@ -12,64 +15,74 @@ import {
   Agent,
   Participant,
   Pipeline,
+  PubSubPublishConfig,
+  PubSubSubscribeConfig,
   Room,
-  RoomMessage,
   Session,
   function_tool,
   get_logger,
 } from '@zeroruntime/js-sdk';
-import { GoogleLLM } from '@zeroruntime/js-sdk/plugins';
+import { CartesiaTTS, DeepgramSTT, GoogleLLM } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('chat_agent');
 
 const TOPIC = 'CHAT';
 
-const send_chat_message = function_tool({
-  name: 'send_chat_message',
-  description:
-    'Send a message to everyone in the room. Use when the caller asks you to ' +
-    'post, announce, or share something with the room.',
-  parameters: {
-    message: { type: 'string', description: 'The text to post.' },
-  },
-  execute: async ({ message }) => {
-    await zeroruntime.current_session().publish(TOPIC, message);
-    return { status: 'sent', topic: TOPIC };
-  },
-});
+const AGENT_ID = process.env.AGENT_ID ?? 'chat-agent';
+
+const room = Room({ name: 'Chat Agent', playground: true });
+
+const pipeline = Pipeline({ stt: DeepgramSTT(), llm: GoogleLLM(), tts: CartesiaTTS() });
 
 class ChatAgent extends Agent {
   constructor() {
     super({
       instructions:
         "You are a helpful assistant in a room's text chat. You can post " +
-        'messages to the room\'s chat when asked. Keep replies short.',
-      agent_id: process.env.AGENT_ID ?? 'chat-agent',
-      pipeline: Pipeline({ llm: GoogleLLM({ model: 'gemini-2.5-flash' }) }),
-      tools: [send_chat_message],
+        "messages to the room's chat when asked. Keep replies short.",
+      agent_id: AGENT_ID,
+      pipeline,
     });
   }
 
+  /** Every answer the agent produces, echoed back into the chat. */
+  async on_llm(data: Record<string, any>): Promise<void> {
+    const text = String(data?.text ?? '').trim();
+    if (text) {
+      await this.session!.publish_to_pubsub(
+        PubSubPublishConfig({ topic: TOPIC, message: text }),
+      );
+    }
+  }
+
+  send_chat_message = function_tool({
+    name: 'send_chat_message',
+    description:
+      'Send a message to everyone in the room. Use when the caller asks you to ' +
+      'post, announce, or share something with the room.',
+    parameters: {
+      message: { type: 'string', description: 'The text to post.' },
+    },
+    execute: async function (this: ChatAgent, { message }) {
+      await this.session!.publish_to_pubsub(
+        PubSubPublishConfig({ topic: TOPIC, message }),
+      );
+      return { status: 'sent', topic: TOPIC };
+    },
+  });
+
   async on_enter(): Promise<void> {
+    await this.session!.subscribe_to_pubsub(
+      PubSubSubscribeConfig({ topic: TOPIC, cb: this.on_chat.bind(this) }),
+    );
     await this.session!.say('Hi! Say something, or type in the room chat.');
   }
 
-  /**
-   * One frame on a subscribed topic.
-   *
-   * `backlog` is checked first and it matters: subscribing replays whatever was
-   * already in the topic, so without this the agent answers every message sent
-   * before it joined, one after another, the moment the call connects.
-   */
-  async on_message(message: RoomMessage): Promise<void> {
-    if (message.backlog) {
-      logger.info(`[history] ${message.topic}: ${message.text}`);
-      return;
-    }
-
-    logger.info(`[chat] ${message.topic}: ${message.text}`);
-
-    await this.session!.process_text(message.text);
+  /** One frame on TOPIC, as the transport delivered it. */
+  async on_chat(message: Record<string, any>, backlog: boolean): Promise<void> {
+    logger.info(`Pubsub message received: ${JSON.stringify(message)}`);
+    const text = String(message?.message ?? '');
+    if (!backlog && text.trim()) await this.session!.process_text(text);
   }
 
   async on_participant_joined(participant: Participant): Promise<void> {
@@ -109,9 +122,7 @@ export async function chat_loop(session: Session): Promise<void> {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(process.env.AGENT_ID ?? 'chat-agent', {
-    room: Room({ name: 'Chat Agent', playground: true, subscribe: [TOPIC] }),
-  });
+  await zeroruntime.invoke(AGENT_ID);
 }
 
-await zeroruntime.serve(ChatAgent, { on_ready });
+await zeroruntime.serve(ChatAgent, { on_ready, room });

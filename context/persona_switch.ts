@@ -11,8 +11,8 @@ import {
   InterruptConfig,
   Pipeline,
   PipelineOptions,
+  PubSubSubscribeConfig,
   Room,
-  RoomMessage,
   get_logger,
 } from '@zeroruntime/js-sdk';
 import {
@@ -28,7 +28,7 @@ import {
   SarvamAITTS,
   TurnDetector,
 } from '@zeroruntime/js-sdk/inference';
-import { SileroVAD } from '@zeroruntime/js-sdk/plugins';
+import { GenerationConfig, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('persona_switch');
 
@@ -46,8 +46,8 @@ const _VOICE =
 const _TUNING = (): PipelineOptions => ({
   vad: SileroVAD(),
   turn_detector: TurnDetector(),
-  eou: EOUConfig({ mode: 'ADAPTIVE', min_max_speech_wait_timeout: [0.1, 0.5] }),
-  interrupt: InterruptConfig({
+  eou_config: EOUConfig({ mode: 'ADAPTIVE', min_max_speech_wait_timeout: [0.1, 0.5] }),
+  interrupt_config: InterruptConfig({
     mode: 'HYBRID',
     interrupt_min_duration: 0.2,
     interrupt_min_words: 2,
@@ -74,7 +74,12 @@ const PERSONAS: Record<string, Persona> = {
   deepgram: _persona('Alex', {
     stt: DeepgramSTT({ model: 'nova-2' }),
     llm: GoogleLLM({ model: 'gemini-3-flash-preview' }),
-    tts: CartesiaTTS({ model: 'sonic-3' }),
+    // sonic-3 is what makes generation_config take effect: Cartesia only reads
+    // it on sonic-3+ and ignores it on earlier voices.
+    tts: CartesiaTTS({
+      model: 'sonic-3',
+      generation_config: GenerationConfig({ speed: 1.1, emotion: 'positivity' }),
+    }),
     ..._TUNING(),
   }),
   assembly: _persona('Maya', {
@@ -102,6 +107,8 @@ const PERSONAS: Record<string, Persona> = {
 
 const FIRST = 'deepgram';
 
+const room = Room({ name: 'Persona Switch', playground: true });
+
 /**
  * One long-lived agent that wears different personas.
  *
@@ -122,15 +129,18 @@ class PersonaAgent extends Agent {
   }
 
   async on_enter(): Promise<void> {
+    await this.session!.subscribe_to_pubsub(
+      PubSubSubscribeConfig({ topic: TOPIC, cb: this.on_chat.bind(this) }),
+    );
     await this.session!.say(
       `Hey! ${PERSONAS[this._current].name} here -- what can I help with?`,
     );
   }
 
   /** A persona name in the room chat switches the pipeline. */
-  async on_message(message: RoomMessage): Promise<void> {
-    if (message.backlog) return;
-    const key = message.text.trim().toLowerCase();
+  async on_chat(frame: Record<string, any>, backlog: boolean): Promise<void> {
+    if (backlog) return;
+    const key = String(frame?.message ?? '').trim().toLowerCase();
     if (!(key in PERSONAS)) {
       logger.info(`ignoring unknown persona: '${key}'`);
       return;
@@ -168,9 +178,7 @@ class PersonaAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
-    room: Room({ name: 'Persona Switch', playground: true, subscribe: [TOPIC] }),
-  });
+  await zeroruntime.invoke(AGENT_ID, { room });
 }
 
 await zeroruntime.serve(PersonaAgent, { on_ready });

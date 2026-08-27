@@ -22,15 +22,15 @@ const pipeline = Pipeline({
   turn_detector: TurnDetector(),
 });
 
-pipeline.on('metrics.stt', (data: Record<string, unknown>) => {
+pipeline.metrics.on('stt', (data: Record<string, unknown>) => {
   logger.info(`stt ${JSON.stringify(data)}`);
 });
 
-pipeline.on('metrics.llm', (data: Record<string, unknown>) => {
+pipeline.metrics.on('llm', (data: Record<string, unknown>) => {
   logger.info(`llm ${JSON.stringify(data)}`);
 });
 
-pipeline.on('metrics.tts', (data: Record<string, unknown>) => {
+pipeline.metrics.on('tts', (data: Record<string, unknown>) => {
   logger.info(`tts ${JSON.stringify(data)}`);
 });
 

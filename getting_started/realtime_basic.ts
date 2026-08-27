@@ -6,7 +6,7 @@ import 'dotenv/config';
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room } from '@zeroruntime/js-sdk';
-import { GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
+import { GeminiLiveConfig, GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
 
 const AGENT_ID = process.env.AGENT_ID ?? 'realtime-basic';
 
@@ -19,10 +19,10 @@ class MyVoiceAgent extends Agent {
       pipeline: Pipeline({
         realtime: GeminiRealtime({
           model: 'gemini-3.1-flash-live-preview',
-          config: {
+          config: GeminiLiveConfig({
             voice: 'Leda',
             response_modalities: ['AUDIO'],
-          },
+          }),
         }),
       }),
     });

@@ -4,7 +4,7 @@
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room, get_logger } from '@zeroruntime/js-sdk';
-import { GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
+import { GeminiLiveConfig, GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('realtime_pipeline_hooks');
 
@@ -13,7 +13,7 @@ const AGENT_ID = process.env.AGENT_ID ?? 'realtime-hooks-agent';
 const pipeline = Pipeline({
   realtime: GeminiRealtime({
     model: 'gemini-3.1-flash-live-preview',
-    config: { voice: 'Leda', response_modalities: ['AUDIO'] },
+    config: GeminiLiveConfig({ voice: 'Leda', response_modalities: ['AUDIO'] }),
   }),
 });
 

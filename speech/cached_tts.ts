@@ -75,7 +75,7 @@ class SupportAgent extends Agent {
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),
-        interrupt: InterruptConfig({ mode: 'HYBRID', interrupt_min_words: 2 }),
+        interrupt_config: InterruptConfig({ mode: 'HYBRID', interrupt_min_words: 2 }),
       }),
     });
   }
