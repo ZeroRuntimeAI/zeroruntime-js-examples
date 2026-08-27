@@ -8,7 +8,7 @@ import 'dotenv/config';
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room } from '@zeroruntime/js-sdk';
-import { GeminiRealtime } from '@zeroruntime/js-sdk/inference';
+import { GeminiLiveConfig, GeminiRealtime } from '@zeroruntime/js-sdk/inference';
 
 const AGENT_ID = process.env.AGENT_ID ?? 'zeroruntime-realtime-inference-agent';
 
@@ -21,12 +21,12 @@ class MyVoiceAgent extends Agent {
       pipeline: Pipeline({
         realtime: GeminiRealtime({
           model: 'gemini-2.5-flash-native-audio-preview-12-2025',
-          config: {
+          config: GeminiLiveConfig({
             voice: 'Puck',
             language_code: 'en-US',
             response_modalities: ['AUDIO'],
             temperature: 0.7,
-          },
+          }),
         }),
       }),
     });

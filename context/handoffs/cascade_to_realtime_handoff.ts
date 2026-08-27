@@ -7,13 +7,7 @@ import 'dotenv/config';
 import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room, function_tool, get_logger } from '@zeroruntime/js-sdk';
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
-import {
-  CartesiaTTS,
-  DeepgramSTT,
-  GeminiRealtime,
-  GoogleLLM,
-  SileroVAD,
-} from '@zeroruntime/js-sdk/plugins';
+import { CartesiaTTS, DeepgramSTT, GeminiLiveConfig, GeminiRealtime, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('cascade_to_realtime_handoff');
 
@@ -24,7 +18,7 @@ function make_realtime_pipeline(): Pipeline {
   return Pipeline({
     realtime: GeminiRealtime({
       model: 'gemini-3.1-flash-live-preview',
-      config: { voice: 'Leda', response_modalities: ['AUDIO'] },
+      config: GeminiLiveConfig({ voice: 'Leda', response_modalities: ['AUDIO'] }),
     }),
   });
 }

@@ -43,7 +43,7 @@ class AppointmentAgent extends Agent {
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),
-        eou: EOUConfig({ mode: 'ADAPTIVE', min_max_speech_wait_timeout: [0.6, 1.4] }),
+        eou_config: EOUConfig({ mode: 'ADAPTIVE', min_max_speech_wait_timeout: [0.6, 1.4] }),
       }),
     });
   }

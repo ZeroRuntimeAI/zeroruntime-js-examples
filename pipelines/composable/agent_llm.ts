@@ -5,7 +5,14 @@
 import 'dotenv/config';
 
 import * as zeroruntime from '@zeroruntime/js-sdk';
-import { Agent, Pipeline, Room, RoomMessage, Session, get_logger } from '@zeroruntime/js-sdk';
+import {
+  Agent,
+  Pipeline,
+  PubSubPublishConfig,
+  PubSubSubscribeConfig,
+  Room,
+  get_logger,
+} from '@zeroruntime/js-sdk';
 import { GoogleLLM } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('agent_llm');
@@ -16,15 +23,7 @@ const OUT_TOPIC = 'AGENT_RESPONSE';
 
 const pipeline = Pipeline({ llm: GoogleLLM() });
 
-let session: Session | null = null;
-
-/** The agent's answer, as text. With no TTS this is the only output there is. */
-pipeline.on('llm', async (data: Record<string, any>) => {
-  const text = data?.text ?? '';
-  if (!text.trim() || session === null) return;
-  logger.info(`agent: ${text}`);
-  await session.publish(OUT_TOPIC, text);
-});
+const room = Room({ name: 'LLM Only', playground: true });
 
 class LlmAgent extends Agent {
   constructor() {
@@ -36,15 +35,31 @@ class LlmAgent extends Agent {
   }
 
   async on_enter(): Promise<void> {
-    session = this.session;
+    await this.session!.subscribe_to_pubsub(
+      PubSubSubscribeConfig({ topic: IN_TOPIC, cb: this.on_chat.bind(this) }),
+    );
   }
 
-  async on_message(message: RoomMessage): Promise<void> {
-    if (message.backlog || message.topic !== IN_TOPIC) return;
-    if (!message.text.trim()) return;
+  /** The agent's answer, as text. With no TTS this is the only output there is. */
+  async on_llm(data: Record<string, any>): Promise<void> {
+    const text = String(data?.text ?? '');
+    if (!text.trim()) return;
+    logger.info(`agent: ${text}`);
+    await this.session!.publish_to_pubsub(
+      PubSubPublishConfig({ topic: OUT_TOPIC, message: text }),
+    );
+  }
 
-    logger.info(`user: ${message.text}`);
-    await this.session!.process_text(message.text);
+  /**
+   * One frame on IN_TOPIC. The second parameter is what keeps the agent from
+   * answering everything typed before it joined.
+   */
+  async on_chat(frame: Record<string, any>, backlog: boolean): Promise<void> {
+    const text = String(frame?.message ?? '');
+    if (backlog || !text.trim()) return;
+
+    logger.info(`user: ${text}`);
+    await this.session!.process_text(text);
   }
 
   async on_exit(): Promise<void> {
@@ -53,9 +68,7 @@ class LlmAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
-    room: Room({ name: 'LLM Only', playground: true, subscribe: [IN_TOPIC] }),
-  });
+  await zeroruntime.invoke(AGENT_ID, { room });
   logger.info(`publish text on '${IN_TOPIC}'; answers arrive on '${OUT_TOPIC}'`);
 }
 

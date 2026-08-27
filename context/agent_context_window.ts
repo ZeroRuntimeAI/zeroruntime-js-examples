@@ -27,7 +27,7 @@ const pipeline = Pipeline({
 });
 
 /** Worth watching here: compaction costs a model call on the turn it fires. */
-pipeline.on('metrics.llm', (data: Record<string, unknown>) => {
+pipeline.metrics.on('llm', (data: Record<string, unknown>) => {
   logger.info(`llm ${JSON.stringify(data)}`);
 });
 

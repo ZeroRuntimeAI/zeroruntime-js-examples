@@ -23,11 +23,11 @@ class VoiceAgent extends Agent {
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),
-        eou: EOUConfig({
+        eou_config: EOUConfig({
           mode: 'ADAPTIVE',
           min_max_speech_wait_timeout: [0.5, 0.8],
         }),
-        interrupt: InterruptConfig({
+        interrupt_config: InterruptConfig({
           mode: 'HYBRID',
           interrupt_min_duration: 0.2,
           interrupt_min_words: 2,
