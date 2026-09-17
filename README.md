@@ -20,6 +20,7 @@ telephony/         phone-call control
 observability/     hooks, events, tracing, recording                    *
 vision/            showing the model what the camera sees
 avatars/           giving the agent a face                              *
+duplex/            GPT-Live (gpt-live-1), listening and speaking at once
 ```
 
 `*` — some examples in these folders need an account, an extra package or a
@@ -56,7 +57,7 @@ DEEPGRAM_API_KEY=...      # DeepgramSTT
 CARTESIA_API_KEY=...      # CartesiaTTS
 ELEVENLABS_API_KEY=...    # ElevenLabsTTS
 GOOGLE_API_KEY=...        # GoogleLLM, GoogleTTS, GeminiRealtime
-OPENAI_API_KEY=...        # OpenAILLM, OpenAITTS
+OPENAI_API_KEY=...        # OpenAILLM, OpenAITTS, OpenAILive
 ANTHROPIC_API_KEY=...     # AnthropicLLM
 SARVAMAI_API_KEY=...      # SarvamAISTT, SarvamAITTS
 SIMLI_API_KEY=...         # SimliAvatar
@@ -124,6 +125,7 @@ Open it and talk to the agent. Ctrl-C to stop.
 | File | What it shows |
 | --- | --- |
 | `context/agent_context_window.ts` | Bounding a long call — summarise or truncate older turns |
+| `context/knowledge_base.ts` | Answering from your uploaded documents, searched every turn |
 | `context/agent_memory.ts` | Long-term memory across calls, searched and written per turn |
 | `context/handoffs/agent_sequential_handoff.ts` | A tool that returns an Agent is the handoff |
 | `context/handoffs/cascade_to_realtime_handoff.ts` | Swapping a live call onto a realtime model |
@@ -175,3 +177,10 @@ Open it and talk to the agent. Ctrl-C to stop.
 | --- | --- |
 | `avatars/avatar_simli_cascade.ts` | Giving a cascade agent a face, with Simli |
 | `avatars/avatar_anam_cascade.ts` | The same slot, with Anam and a function tool |
+
+### Duplex
+
+| File | What it shows |
+| --- | --- |
+| `duplex/openai_live_delegate_llm.ts` | GPT-Live with its delegations answered by an LLM you choose |
+| `duplex/openai_live_restaurant_booking.ts` | Booking a table, with a full slot that frees up mid-call |
