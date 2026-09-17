@@ -1,6 +1,6 @@
 # Conversation and context
 
-Most examples here need nothing beyond the root setup. Three want something
+Most examples here need nothing beyond the root setup. Four want something
 extra.
 
 ## agent_memory.ts
@@ -16,6 +16,24 @@ MEM0_USER_ID=demo-user     # optional, this is the default
 
 Without `MEM0_API_KEY` the example still runs: it logs a warning and behaves
 like an agent with no memory, which makes it a poor demo but a working call.
+
+## knowledge_base.ts
+
+Answers come from knowledge documents you upload in the dashboard, so the
+example ships with placeholder ids and needs your own:
+
+```bash
+KNOWLEDGE_IDS=doc-id-1,doc-id-2
+```
+
+The ids are on the dashboard's knowledge page, one per document; the agent
+searches every id it is given on every turn. Left as the placeholders the call
+still runs, but each turn's lookup comes back `no knowledge doc found` and the
+agent answers from the model alone — a working call and a useless demo. An
+empty list is the one thing rejected outright, at startup.
+
+`KnowledgeBase` also takes `context_prefix`, to replace the line placed above
+the retrieved sections, and `api_base_url` for a non-production host.
 
 ## translator_agent.ts
 
