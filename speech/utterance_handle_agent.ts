@@ -11,8 +11,6 @@ import { CartesiaTTS, DeepgramSTT, OpenAILLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('utterance_handle_agent');
 
-const AGENT_ID = 'utterance-handle-agent';
-
 const sleep = (seconds: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 
@@ -20,7 +18,6 @@ const sleep = (seconds: number): Promise<void> =>
 class VoiceAgent extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions:
         'You are a helpful voice assistant. You can answer questions and fetch ' +
         "weather information using the 'get_weather' tool. You can also perform " +
@@ -87,7 +84,7 @@ class VoiceAgent extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Utterance Handle', playground: true }),
   });
 }

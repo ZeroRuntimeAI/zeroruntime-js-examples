@@ -8,12 +8,9 @@ import { Agent, DTMFHandler, Pipeline, Room, VoiceMailDetector } from '@zerorunt
 import { TurnDetector,DeepgramSTT, CartesiaTTS, GoogleLLM } from '@zeroruntime/js-sdk/inference';
 import { SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = 'dtmf-voicemail';
-
 class VoiceAgent extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions: 'You are a helpful voice assistant that can answer questions.',
       pipeline: Pipeline({
         stt: DeepgramSTT(),
@@ -48,7 +45,7 @@ class VoiceAgent extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'DTMF Voicemail', playground: true }),
   });
 }

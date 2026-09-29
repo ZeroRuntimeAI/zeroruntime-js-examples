@@ -11,11 +11,9 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('pipeline_events');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'pipeline-events';
-
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
-  llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+  llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   tts: CartesiaTTS(),
   vad: SileroVAD(),
   turn_detector: TurnDetector(),
@@ -77,7 +75,6 @@ class WatchedAgent extends Agent {
   constructor() {
     super({
       instructions: 'You are a helpful assistant. Keep answers short.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -92,7 +89,7 @@ class WatchedAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Pipeline Events', playground: true, recording: true }),
   });
 }

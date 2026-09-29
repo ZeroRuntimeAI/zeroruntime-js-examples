@@ -8,8 +8,6 @@ import { GeminiLiveConfig, GeminiRealtime } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('realtime_pipeline_hooks');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'realtime-hooks-agent';
-
 const pipeline = Pipeline({
   realtime: GeminiRealtime({
     model: 'gemini-3.1-flash-live-preview',
@@ -49,7 +47,6 @@ class MyVoiceAgent extends Agent {
     super({
       instructions:
         'You are a helpful voice assistant that can answer questions and help with tasks.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -64,7 +61,7 @@ class MyVoiceAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Realtime Pipeline Hooks', playground: true }),
   });
 }

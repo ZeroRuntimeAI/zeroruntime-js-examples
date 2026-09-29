@@ -12,7 +12,6 @@ import { AnthropicLLM, DeepgramSTT, GoogleTTS, SileroVAD } from '@zeroruntime/js
 
 const logger = get_logger('customer_agent');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'customer-agent';
 const SERVER = join(dirname(fileURLToPath(import.meta.url)), 'discord_mcp_server.ts');
 
 const HUMAN_TIMEOUT = Number(process.env.HUMAN_REPLY_TIMEOUT ?? '300');
@@ -26,7 +25,6 @@ class CustomerAgent extends Agent {
         'use the tool to get the answer from your human supervisor -- never ' +
         'estimate one. Tell the caller you are checking before you call it, ' +
         'because the answer takes a moment.',
-      agent_id: AGENT_ID,
       mcp_servers: [
         MCPServerStdio({
           executable_path: 'npx',
@@ -56,7 +54,7 @@ class CustomerAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Customer Agent', playground: true }),
   });
 }

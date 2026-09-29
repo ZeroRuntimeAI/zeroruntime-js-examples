@@ -15,7 +15,6 @@ import { CartesiaTTS, GoogleLLM } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('agent_text_to_voice');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'text-to-voice-agent';
 const IN_TOPIC = 'CHAT';
 
 const room = Room({ name: 'Text to Voice', playground: true });
@@ -25,7 +24,6 @@ class TextToVoiceAgent extends Agent {
     super({
       instructions:
         'You are a helpful assistant. Keep spoken answers short -- they are read aloud.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({ llm: GoogleLLM(), tts: CartesiaTTS() }),
     });
   }
@@ -53,7 +51,7 @@ class TextToVoiceAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, { room });
+  await zeroruntime.invoke({ room });
   logger.info(`publish text on the '${IN_TOPIC}' topic to hear it answered`);
 }
 

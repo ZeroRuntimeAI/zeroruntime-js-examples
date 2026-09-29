@@ -10,8 +10,6 @@ import { Agent, KnowledgeBase, Pipeline, Room } from '@zeroruntime/js-sdk';
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = process.env.AGENT_ID ?? 'knowledge-base';
-
 // One id per document, from the dashboard's knowledge page. The placeholders
 // keep the call running, but every lookup comes back empty -- see context/README.md.
 const KNOWLEDGE_IDS = (process.env.KNOWLEDGE_IDS ?? 'kb_id_1,kb_id_2')
@@ -21,7 +19,7 @@ const KNOWLEDGE_IDS = (process.env.KNOWLEDGE_IDS ?? 'kb_id_1,kb_id_2')
 
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
-  llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+  llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   tts: CartesiaTTS(),
   vad: SileroVAD(),
   turn_detector: TurnDetector(),
@@ -41,7 +39,6 @@ class SupportAgent extends Agent {
         'You are a support agent. Answer from the context you are given and ' +
         'nothing else. When it does not cover the question, say so and offer to ' +
         'pass the question on.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -56,7 +53,7 @@ class SupportAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Knowledge Base', playground: true }),
   });
 }

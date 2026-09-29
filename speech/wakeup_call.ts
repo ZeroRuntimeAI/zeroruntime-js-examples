@@ -8,12 +8,9 @@ import { Agent, Pipeline, Room } from '@zeroruntime/js-sdk';
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { AnthropicLLM, DeepgramSTT, GoogleTTS, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = 'wakeup-call-agent';
-
 class VoiceAgent extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions:
         'You are a helpful voice assistant that can answer questions and help ' +
         'with tasks and help with horoscopes and weather.',
@@ -42,7 +39,7 @@ class VoiceAgent extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Wakeup Call', playground: true }),
   });
 }

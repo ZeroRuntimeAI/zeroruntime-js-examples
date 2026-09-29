@@ -9,7 +9,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('appointment_telephony');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'appointment-agent';
 const N8N_URL = process.env.N8N_MCP_URL ?? 'https://your-n8n-instance/mcp/your-trigger-id';
 
 const INSTRUCTIONS =
@@ -27,7 +26,6 @@ class AppointmentAgent extends Agent {
 
     super({
       instructions: INSTRUCTIONS,
-      agent_id: AGENT_ID,
       mcp_servers: [
         MCPServerHTTP({
           endpoint_url: N8N_URL,
@@ -39,7 +37,7 @@ class AppointmentAgent extends Agent {
       ],
       pipeline: Pipeline({
         stt: DeepgramSTT({ model: 'nova-2' }),
-        llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+        llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),
@@ -62,7 +60,7 @@ class AppointmentAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Restaurant Agent', playground: true }),
   });
 }

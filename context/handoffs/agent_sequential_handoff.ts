@@ -11,8 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('agent_sequential_handoff');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'intake';
-
 /**
  * A fresh pipeline per agent.
  *
@@ -41,7 +39,6 @@ class BillingAgent extends Agent {
       instructions:
         'You are the billing specialist. Resolve charge disputes, payment ' +
         'questions, and refunds.',
-      agent_id: 'billing',
       pipeline: build_pipeline(),
       inherit_context,
     });
@@ -76,7 +73,6 @@ class IntakeAgent extends Agent {
         'You are the first line of support. Find out what the caller needs. If ' +
         'it is about a charge, a payment or a refund, call transfer_to_billing ' +
         'with a short reason.',
-      agent_id: AGENT_ID,
       pipeline: build_pipeline(),
     });
   }
@@ -109,7 +105,7 @@ class IntakeAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Sequential Handoff', playground: true }),
   });
 }

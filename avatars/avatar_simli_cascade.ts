@@ -17,7 +17,6 @@ import {
 
 const logger = get_logger('avatar_simli_cascade');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'simli-avatar-agent';
 const FACE_ID = process.env.SIMLI_FACE_ID ?? 'your-simli-face-id';
 
 class AvatarAgent extends Agent {
@@ -30,10 +29,9 @@ class AvatarAgent extends Agent {
       instructions:
         'You are a friendly assistant with a face. Keep replies short and ' +
         'conversational -- long monologues look wrong on a talking head.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT({ model: 'nova-2' }),
-        llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+        llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),
@@ -59,7 +57,7 @@ class AvatarAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Simli Avatar', playground: true }),
   });
 }

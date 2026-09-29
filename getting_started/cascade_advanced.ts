@@ -9,14 +9,11 @@ import { Agent, EOUConfig, InterruptConfig, Pipeline, Room } from '@zeroruntime/
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = process.env.AGENT_ID ?? 'cascade-advanced';
-
 class VoiceAgent extends Agent {
   constructor() {
     super({
       instructions:
         'You are a helpful voice assistant that can answer questions and help with tasks.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT(),
         llm: GoogleLLM(),
@@ -52,7 +49,7 @@ class VoiceAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Cascade Advanced', playground: true }),
   });
 }

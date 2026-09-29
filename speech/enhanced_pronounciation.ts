@@ -10,8 +10,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('enhanced_pronounciation');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'enhanced-pronounciation';
-
 const RULES = [
   PronunciationRule('nginx', 'engine x'),
   PronunciationRule('URL', 'U R L'),
@@ -27,7 +25,7 @@ const RULES = [
 
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
-  llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+  llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   tts: CartesiaTTS(),
   vad: SileroVAD(),
   pronunciations: RULES,
@@ -39,7 +37,6 @@ class DocsAgent extends Agent {
       instructions:
         'You are a developer support agent. Answer questions about APIs, HTTP, ' +
         'JSON and SQL. Keep answers short and conversational.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -54,7 +51,7 @@ class DocsAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Pronunciation', playground: true }),
   });
 }

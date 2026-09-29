@@ -17,7 +17,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('reply_interrupt_agent');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'reply-interrupt-agent';
 const TOPIC = 'CHAT';
 
 const room = Room({ name: 'Reply / Interrupt', playground: true });
@@ -27,7 +26,6 @@ class ControllableAgent extends Agent {
     super({
       instructions:
         'You are a helpful voice assistant that can answer questions and help with tasks.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT(),
         llm: GoogleLLM(),
@@ -68,7 +66,7 @@ class ControllableAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, { room });
+  await zeroruntime.invoke({ room });
   logger.info(`publish 'reply' or 'interrupt' on the '${TOPIC}' topic`);
 }
 

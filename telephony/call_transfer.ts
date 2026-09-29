@@ -7,12 +7,9 @@ import { Agent, Pipeline, Room, function_tool } from '@zeroruntime/js-sdk';
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = 'call-transfer-agent';
-
 class CallTransferAgent extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions:
         'You are the Call Transfer Agent which helps transfer an ongoing call ' +
         'to a new number. Use the transfer_call tool to transfer.',
@@ -51,7 +48,7 @@ class CallTransferAgent extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Call Transfer Agent', playground: true }),
   });
 }

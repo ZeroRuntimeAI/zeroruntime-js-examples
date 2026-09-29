@@ -17,12 +17,9 @@ import {
   SileroVAD,
 } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = 'fallback-recovery-agent';
-
 class ResilientAgent extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions:
         'You are a helpful voice assistant that can answer questions and help with tasks.',
       pipeline: Pipeline({
@@ -37,7 +34,7 @@ class ResilientAgent extends Agent {
           latency_threshold_ms: 350,
           consecutive_latency_hits: 3,
         }),
-        llm: FallbackLLM([OpenAILLM({ model: 'gpt-4o-mini' }), GoogleLLM({ model: 'gemini-2.5-flash' })], {
+        llm: FallbackLLM([OpenAILLM({ model: 'gpt-4o-mini' }), GoogleLLM({ model: 'gemini-3.5-flash' })], {
           temporary_disable_sec: 30.0,
           permanent_disable_after_attempts: 3,
           latency_threshold_ms: 800,
@@ -67,7 +64,7 @@ class ResilientAgent extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Fallback Recovery', playground: true }),
   });
 }

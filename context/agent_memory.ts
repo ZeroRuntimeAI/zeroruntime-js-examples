@@ -11,7 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('agent_memory');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'agent-memory';
 const USER_ID = process.env.MEM0_USER_ID ?? 'demo-user';
 
 /** Thin mem0 client. Swap it for a vector index or your CRM -- it runs here. */
@@ -130,7 +129,6 @@ class PersonalAssistant extends Agent {
         'You are a friendly personal assistant. You remember things users tell ' +
         'you like their name, preferences, and interests. Use what you know to ' +
         'make conversations feel personal. Keep responses short and conversational.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -146,7 +144,7 @@ class PersonalAssistant extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Personal Assistant', playground: true }),
   });
 }

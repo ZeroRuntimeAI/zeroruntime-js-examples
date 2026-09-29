@@ -22,8 +22,6 @@ import { DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('voice_pipeline_hooks');
 
-const AGENT_ID = 'voice-pipeline-hooks-agent';
-
 const FILLERS = /\b(?:uh|um|like)\b/g;
 
 const SYNONYMS: Record<string, string> = {
@@ -117,7 +115,6 @@ function build_pipeline(): Pipeline {
 class VoicePipelineHooks extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions: 'You are a helpful voice assistant.',
       pipeline: build_pipeline(),
     });
@@ -133,7 +130,7 @@ class VoicePipelineHooks extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Voice Pipeline Hooks', playground: true, room_id: '8ci6-jzbc-e049' }),
   });
 }

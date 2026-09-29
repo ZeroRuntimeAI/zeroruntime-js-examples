@@ -28,8 +28,6 @@ const logger = get_logger('chat_agent');
 
 const TOPIC = 'CHAT';
 
-const AGENT_ID = process.env.AGENT_ID ?? 'chat-agent';
-
 const room = Room({ name: 'Chat Agent', playground: true });
 
 const pipeline = Pipeline({ stt: DeepgramSTT(), llm: GoogleLLM(), tts: CartesiaTTS() });
@@ -40,7 +38,6 @@ class ChatAgent extends Agent {
       instructions:
         "You are a helpful assistant in a room's text chat. You can post " +
         "messages to the room's chat when asked. Keep replies short.",
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -122,7 +119,7 @@ export async function chat_loop(session: Session): Promise<void> {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID);
+  await zeroruntime.invoke();
 }
 
 await zeroruntime.serve(ChatAgent, { on_ready, room });

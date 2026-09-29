@@ -22,7 +22,6 @@ import {
 import { TurnDetector } from '@zeroruntime/js-sdk/inference';
 import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
-const AGENT_ID = 'warm-transfer';
 const SUPERVISOR_JOIN_TIMEOUT = 120.0;
 const BRIEFING_TIMEOUT = 180.0;
 const TRANSFER_BUDGET = SUPERVISOR_JOIN_TIMEOUT + BRIEFING_TIMEOUT + 60.0;
@@ -41,7 +40,6 @@ function _pipeline(): Pipeline {
 class CustomerServiceAgent extends Agent {
   constructor() {
     super({
-      agent_id: AGENT_ID,
       instructions:
         'You are a helpful customer service agent. If the caller asks to speak ' +
         'to a manager or supervisor, or their issue needs a human, call the ' +
@@ -114,7 +112,7 @@ class CustomerServiceAgent extends Agent {
 }
 
 async function invoke_agent(): Promise<void> {
-  const started = await zeroruntime.invoke(AGENT_ID, {
+  const started = await zeroruntime.invoke({
     room: Room({ name: 'Warm Transfer Demo', playground: true }),
   });
   console.log(`room_id=${started.room_id} -- point a SIP call at this room`);

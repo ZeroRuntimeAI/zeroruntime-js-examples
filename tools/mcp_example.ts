@@ -15,8 +15,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('mcp_example');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'mcp-agent';
-
 const here = dirname(fileURLToPath(import.meta.url));
 const MCP_SERVER = resolve(
   process.env.MCP_SERVER ?? join(here, 'mcp_servers', 'current_time.ts'),
@@ -32,10 +30,9 @@ class MCPAgent extends Agent {
       instructions:
         'You are a helpful voice assistant that can answer questions and help ' +
         'with tasks. You have tools available -- use them rather than guessing.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT({ model: 'nova-2' }),
-        llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+        llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),
@@ -65,7 +62,7 @@ class MCPAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'MCP Agent', playground: true }),
   });
 }
