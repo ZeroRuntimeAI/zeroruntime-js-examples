@@ -11,8 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GeminiLiveConfig, GeminiRealtime, GoogleLLM, 
 
 const logger = get_logger('cascade_to_realtime_handoff');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'support';
-
 /** The whole pipeline, not a patch -- realtime replaces stt/llm/tts. */
 function make_realtime_pipeline(): Pipeline {
   return Pipeline({
@@ -32,7 +30,6 @@ class SupportAgent extends Agent {
       instructions:
         'You are a support agent. Answer questions about orders. If the caller ' +
         'asks for faster or more natural responses, call switch_to_realtime.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT(),
         llm: GoogleLLM(),
@@ -92,7 +89,7 @@ class SupportAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Cascade to Realtime', playground: true }),
   });
 }

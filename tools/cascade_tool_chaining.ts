@@ -11,8 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('cascade_tool_chaining');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'tool-chaining-agent';
-
 const get_weather = function_tool({
   name: 'get_weather',
   description: 'Get the current temperature for a city. Call this first.',
@@ -91,7 +89,6 @@ class ToolChainingAgent extends Agent {
         '4. Finally, combine all three results into a natural spoken response.\n\n' +
         'You MUST call all three tools in sequence -- do NOT skip any step. Keep ' +
         'your final response concise and conversational (2-3 sentences max).',
-      agent_id: AGENT_ID,
       tools: [get_weather, get_clothing_advice, get_activity_suggestion],
       pipeline: Pipeline({
         stt: DeepgramSTT(),
@@ -116,7 +113,7 @@ class ToolChainingAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Tool Chaining', playground: true }),
   });
 }

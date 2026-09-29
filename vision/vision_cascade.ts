@@ -17,7 +17,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('vision_cascade');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'vision-agent';
 const TOPIC = 'CHAT';
 
 const room = Room({ name: 'Vision Cascade', playground: true, vision: true });
@@ -28,7 +27,6 @@ class VisionAgent extends Agent {
       instructions:
         'YOU CAN ONLY SPEAK IN ENGLISH. You are a helpful voice assistant that ' +
         'can answer questions and help with tasks.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT(),
         llm: GoogleLLM(),
@@ -62,7 +60,7 @@ class VisionAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, { room });
+  await zeroruntime.invoke({ room });
   logger.info(`publish 'capture_frames' on the '${TOPIC}' topic to trigger a look`);
 }
 

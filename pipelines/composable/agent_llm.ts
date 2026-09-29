@@ -17,7 +17,6 @@ import { GoogleLLM } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('agent_llm');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'llm-only-agent';
 const IN_TOPIC = 'CHAT';
 const OUT_TOPIC = 'AGENT_RESPONSE';
 
@@ -29,7 +28,6 @@ class LlmAgent extends Agent {
   constructor() {
     super({
       instructions: 'You are a helpful assistant. Answer in text, concisely.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -68,7 +66,7 @@ class LlmAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, { room });
+  await zeroruntime.invoke({ room });
   logger.info(`publish text on '${IN_TOPIC}'; answers arrive on '${OUT_TOPIC}'`);
 }
 

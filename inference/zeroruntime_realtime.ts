@@ -10,14 +10,11 @@ import * as zeroruntime from '@zeroruntime/js-sdk';
 import { Agent, Pipeline, Room } from '@zeroruntime/js-sdk';
 import { GeminiLiveConfig, GeminiRealtime } from '@zeroruntime/js-sdk/inference';
 
-const AGENT_ID = process.env.AGENT_ID ?? 'zeroruntime-realtime-inference-agent';
-
 class MyVoiceAgent extends Agent {
   constructor() {
     super({
       instructions:
         'You are a helpful voice assistant that can answer questions and help with tasks.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         realtime: GeminiRealtime({
           model: 'gemini-2.5-flash-native-audio-preview-12-2025',
@@ -42,7 +39,7 @@ class MyVoiceAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'ZeroRuntime Realtime Inference', playground: true }),
   });
 }

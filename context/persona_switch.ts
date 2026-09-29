@@ -33,7 +33,6 @@ import { GenerationConfig, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 const logger = get_logger('persona_switch');
 
 const TOPIC = 'CHAT';
-const AGENT_ID = process.env.AGENT_ID ?? 'persona-switch';
 
 const _VOICE =
   'You are a general-purpose voice AI assistant powered by ZeroRuntime. You ' +
@@ -123,7 +122,6 @@ class PersonaAgent extends Agent {
     const start = PERSONAS[FIRST];
     super({
       instructions: start.instructions,
-      agent_id: AGENT_ID,
       pipeline: start.pipeline,
     });
   }
@@ -178,7 +176,7 @@ class PersonaAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, { room });
+  await zeroruntime.invoke({ room });
 }
 
 await zeroruntime.serve(PersonaAgent, { on_ready });

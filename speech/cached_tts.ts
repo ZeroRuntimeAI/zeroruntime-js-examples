@@ -16,8 +16,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('cached_tts');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'cached-tts-agent';
-
 const GREETING = "Hi, you've reached support. How can I help?";
 const HOLD = 'Let me check that for you, one moment.';
 const GOODBYE = 'Thanks for calling. Goodbye.';
@@ -68,7 +66,6 @@ class SupportAgent extends Agent {
       instructions:
         'You are a support agent. Answer questions about orders. Use ' +
         'check_order_status rather than guessing.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         stt: DeepgramSTT(),
         llm: GoogleLLM(),
@@ -103,7 +100,7 @@ class SupportAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Cached TTS', playground: true }),
   });
 }

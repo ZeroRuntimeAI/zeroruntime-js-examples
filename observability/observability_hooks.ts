@@ -11,7 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('observability_hooks');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'observability-agent';
 const OTLP_URL = process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? '';
 
 const pipeline = Pipeline({
@@ -47,7 +46,6 @@ class MyVoiceAgent extends Agent {
   constructor() {
     super({
       instructions: 'You are a helpful voice assistant that can answer questions.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -78,7 +76,7 @@ class MyVoiceAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({
       name: 'Observability Hooks',
       playground: true,

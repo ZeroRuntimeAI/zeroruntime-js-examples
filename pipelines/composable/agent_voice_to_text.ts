@@ -17,7 +17,6 @@ import { DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-sdk/plugins';
 
 const logger = get_logger('agent_voice_to_text');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'voice-to-text-agent';
 const OUT_TOPIC = 'AGENT_RESPONSE';
 
 const pipeline = Pipeline({
@@ -37,7 +36,6 @@ class VoiceToTextAgent extends Agent {
     super({
       instructions:
         'You are a helpful assistant listening to a call. Answer concisely in text.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -65,7 +63,7 @@ class VoiceToTextAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Voice to Text', playground: true }),
   });
   logger.info(`speak in the room; answers arrive on '${OUT_TOPIC}'`);

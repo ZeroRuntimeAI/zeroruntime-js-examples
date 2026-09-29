@@ -11,8 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GeminiLiveConfig, GeminiRealtime, GoogleLLM, 
 
 const logger = get_logger('realtime_to_cascade_handoff');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'realtime-support';
-
 /** The whole pipeline. Every slot named -- omitting one empties it. */
 function make_cascade_pipeline(): Pipeline {
   return Pipeline({
@@ -33,7 +31,6 @@ class RealtimeSupportAgent extends Agent {
       instructions:
         'You are a support agent. If the caller asks for a different voice, or ' +
         'for a cheaper or more configurable mode, call switch_to_cascade.',
-      agent_id: AGENT_ID,
       pipeline: Pipeline({
         realtime: GeminiRealtime({
           model: 'gemini-3.1-flash-live-preview',
@@ -79,7 +76,7 @@ class RealtimeSupportAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Realtime to Cascade', playground: true }),
   });
 }

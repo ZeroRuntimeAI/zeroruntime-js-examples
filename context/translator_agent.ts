@@ -16,8 +16,6 @@ import {
 
 const logger = get_logger('translator_agent');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'translator-agent';
-
 let current_language = 'en-IN';
 let session: Session | null = null;
 
@@ -85,7 +83,6 @@ class TranslatorAgent extends Agent {
       instructions:
         'You are a helpful translator assistant that can speak to the user in ' +
         'their language.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -100,7 +97,7 @@ class TranslatorAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Translator Agent', playground: true }),
   });
 }

@@ -11,8 +11,6 @@ import { CartesiaTTS, DeepgramSTT, GoogleLLM, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('agent_context_window');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'context-window';
-
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
   llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
@@ -37,7 +35,6 @@ class LongCallAgent extends Agent {
       instructions:
         'You are a patient support agent. The caller may talk for a long time. ' +
         'Refer back to what they told you earlier.',
-      agent_id: AGENT_ID,
       pipeline,
     });
   }
@@ -53,7 +50,7 @@ class LongCallAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Context Window', playground: true }),
   });
 }

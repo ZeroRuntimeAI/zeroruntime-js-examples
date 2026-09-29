@@ -18,7 +18,6 @@ import {
 
 const logger = get_logger('avatar_anam_cascade');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'anam-avatar-agent';
 const AVATAR_ID = process.env.ANAM_AVATAR_ID ?? 'your-anam-avatar-id';
 
 const get_weather = function_tool({
@@ -56,7 +55,6 @@ class AvatarVoiceAgent extends Agent {
         'You are a helpful virtual assistant with a visual avatar that can ' +
         'answer questions about weather and help with other tasks. Keep replies ' +
         'short and conversational -- long monologues look wrong on a talking head.',
-      agent_id: AGENT_ID,
       tools: [get_weather],
       pipeline: Pipeline({
         stt: DeepgramSTT({ model: 'nova-2' }),
@@ -81,7 +79,7 @@ class AvatarVoiceAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: 'Anam Avatar', playground: true }),
   });
 }

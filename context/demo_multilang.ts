@@ -13,8 +13,6 @@ import { GoogleLLM, SarvamAISTT, SarvamAITTS, SileroVAD } from '@zeroruntime/js-
 
 const logger = get_logger('demo_multilang');
 
-const AGENT_ID = process.env.AGENT_ID ?? 'multilang-loan-advisor';
-
 const base_prompt = (currency: string, label: string): string =>
   'You are a business loan advisor. Help the caller understand loan products, ' +
   'check eligibility, and work out an EMI. Use the tools rather than ' +
@@ -139,7 +137,6 @@ class MultilangLoanAgent extends Agent {
   constructor() {
     super({
       instructions: instructions_for(CFG),
-      agent_id: AGENT_ID,
       tools: [get_loan_products, calculate_emi, check_eligibility],
       pipeline: Pipeline({
         stt: SarvamAISTT({ model: 'saaras:v3', language: CFG.code }),
@@ -190,7 +187,7 @@ class MultilangLoanAgent extends Agent {
 }
 
 async function on_ready(): Promise<void> {
-  await zeroruntime.invoke(AGENT_ID, {
+  await zeroruntime.invoke({
     room: Room({ name: `Loan Advisor (${CFG.label})`, playground: true }),
   });
 }
