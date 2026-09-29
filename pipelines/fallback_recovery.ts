@@ -34,7 +34,7 @@ class ResilientAgent extends Agent {
           latency_threshold_ms: 350,
           consecutive_latency_hits: 3,
         }),
-        llm: FallbackLLM([OpenAILLM({ model: 'gpt-4o-mini' }), GoogleLLM({ model: 'gemini-2.5-flash' })], {
+        llm: FallbackLLM([OpenAILLM({ model: 'gpt-4o-mini' }), GoogleLLM({ model: 'gemini-3.5-flash' })], {
           temporary_disable_sec: 30.0,
           permanent_disable_after_attempts: 3,
           latency_threshold_ms: 800,

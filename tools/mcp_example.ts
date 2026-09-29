@@ -32,7 +32,7 @@ class MCPAgent extends Agent {
         'with tasks. You have tools available -- use them rather than guessing.',
       pipeline: Pipeline({
         stt: DeepgramSTT({ model: 'nova-2' }),
-        llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+        llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
         tts: CartesiaTTS(),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),

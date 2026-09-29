@@ -140,7 +140,7 @@ class MultilangLoanAgent extends Agent {
       tools: [get_loan_products, calculate_emi, check_eligibility],
       pipeline: Pipeline({
         stt: SarvamAISTT({ model: 'saaras:v3', language: CFG.code }),
-        llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+        llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
         tts: SarvamAITTS({ model: 'bulbul:v3', language: CFG.code }),
         vad: SileroVAD(),
         turn_detector: TurnDetector(),

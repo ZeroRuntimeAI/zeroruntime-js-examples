@@ -13,14 +13,14 @@ const logger = get_logger('agent_context_window');
 
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
-  llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+  llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   tts: CartesiaTTS(),
   vad: SileroVAD(),
   turn_detector: TurnDetector(),
   context_window: ContextWindow({
     max_tokens: 1500,
     keep_recent_turns: 4,
-    summary_llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+    summary_llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   }),
 });
 

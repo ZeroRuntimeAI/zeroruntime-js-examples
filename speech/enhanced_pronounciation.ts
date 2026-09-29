@@ -25,7 +25,7 @@ const RULES = [
 
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
-  llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+  llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   tts: CartesiaTTS(),
   vad: SileroVAD(),
   pronunciations: RULES,

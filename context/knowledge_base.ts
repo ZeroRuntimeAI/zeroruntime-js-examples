@@ -19,7 +19,7 @@ const KNOWLEDGE_IDS = (process.env.KNOWLEDGE_IDS ?? 'kb_id_1,kb_id_2')
 
 const pipeline = Pipeline({
   stt: DeepgramSTT({ model: 'nova-2' }),
-  llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+  llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
   tts: CartesiaTTS(),
   vad: SileroVAD(),
   turn_detector: TurnDetector(),

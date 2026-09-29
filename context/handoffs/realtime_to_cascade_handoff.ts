@@ -15,7 +15,7 @@ const logger = get_logger('realtime_to_cascade_handoff');
 function make_cascade_pipeline(): Pipeline {
   return Pipeline({
     stt: DeepgramSTT({ model: 'nova-2' }),
-    llm: GoogleLLM({ model: 'gemini-2.5-flash' }),
+    llm: GoogleLLM({ model: 'gemini-3.5-flash' }),
     tts: CartesiaTTS(),
     vad: SileroVAD(),
     turn_detector: TurnDetector(),
