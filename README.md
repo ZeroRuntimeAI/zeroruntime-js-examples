@@ -127,7 +127,6 @@ Open it and talk to the agent. Ctrl-C to stop.
 | `context/agent_context_window.ts` | Bounding a long call — summarise or truncate older turns |
 | `context/knowledge_base.ts` | Answering from your uploaded documents, searched every turn |
 | `context/agent_memory.ts` | Long-term memory across calls, searched and written per turn |
-| `context/handoffs/agent_sequential_handoff.ts` | A tool that returns an Agent is the handoff |
 | `context/handoffs/cascade_to_realtime_handoff.ts` | Swapping a live call onto a realtime model |
 | `context/handoffs/realtime_to_cascade_handoff.ts` | And back again |
 | `context/multi_agent_switch.ts` | One caller, three agents, handoff in either direction |
